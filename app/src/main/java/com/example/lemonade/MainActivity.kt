@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
 import com.example.lemonade.ui.theme.LemonadeTheme
 
 class MainActivity : ComponentActivity() {
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun LemonApp() {
-    var currentStep by remember { mutableStateOf(1) }    //初期値が１に設定された可変のStateオブジェクトをremenberでcurrentstepに常に保持する
+    var currentStep by remember { mutableStateOf(1) } // 初期値が１に設定された可変のStateオブジェクトをrememberでcurrentStepに保持
     var squeezeCount by remember { mutableStateOf(0) }
 
     Scaffold(
@@ -86,7 +87,7 @@ fun LemonApp() {
                         imageResorceId = R.drawable.lemon_tree,
                         onImageClick = {
                             currentStep = 2
-                            squeezeCount = (2..4).random()
+                            squeezeCount = (2..4).random() // ランダムな絞る回数を設定
                         }
                     )
                 }
@@ -97,10 +98,11 @@ fun LemonApp() {
                         imageResorceId = R.drawable.lemon_squeeze,
                         onImageClick = {
                             squeezeCount--
-                            if (squeezeCount == 0) {
+                            if (squeezeCount <= 0) {
                                 currentStep = 3
                             }
-                        }
+                        },
+                        squeezeCount = squeezeCount // squeezeCountを渡す
                     )
                 }
 
@@ -133,16 +135,30 @@ fun LemonTextAndImage(
     textResorcedId: Int,
     imageResorceId: Int,
     onImageClick: () -> Unit,
+    squeezeCount: Int = 0, // squeezeCountを追加
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
+
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
+            // 絞る回数を画像の上に表示
+            if (squeezeCount > 0) {
+                Text(
+                    text = "$squeezeCount",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+
             Button(
                 onClick = onImageClick,
                 shape = RoundedCornerShape(dimensionResource(R.dimen.button_corner_radius)),
