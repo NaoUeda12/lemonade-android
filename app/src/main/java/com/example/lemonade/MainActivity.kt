@@ -134,17 +134,26 @@ fun LemonApp() {
                 AlertDialog(
                     onDismissRequest = {
                         showCompletionDialog = false // ポップアップを閉じる
-                        currentStep = 4 // グラスを空に戻す
+                        currentStep = 4
                     },
                     title = { Text(text = "完成！") },
                     text = { Text(text = "レモネードが完成しました！") },
                     confirmButton = {
                         Button(onClick = {
                             showCompletionDialog = false // ポップアップを閉じる
-                            currentStep = 1 // グラスを空に戻す
+                            currentStep = 4
                         }) {
                             Text("閉じる")
                         }
+                    }
+                )
+            }
+            else if (currentStep == 4) {
+                LemonTextAndImage(
+                    textResorcedId = R.string.Emptyglass,
+                    imageResorceId = R.drawable.lemon_restart,
+                    onImageClick = {
+                        currentStep = 1 // 再スタートする場合の処理
                     }
                 )
             }
