@@ -3,6 +3,8 @@ package com.example.lemonade
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,9 +38,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import com.example.lemonade.ui.theme.LemonadeTheme
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,12 +200,31 @@ fun StartButton(onClick: () -> Unit) {
 fun LemonImageOnStartScreen(
     imageResorceId: Int
 ) {
+    var isExpanded by remember { mutableStateOf(true) } // 初期は拡大状態
+
+    // アニメーションのスケールを制御
+    val scale: Float by animateFloatAsState(
+        targetValue = if (isExpanded) 2f else 1f, // 2倍か1倍にスケール
+        animationSpec = tween(durationMillis = 4000) // 4秒で変化
+    )
+    
+    // アニメーションを5秒間繰り返す
+    LaunchedEffect(Unit) {
+        while (true) {
+            isExpanded = !isExpanded // スケールの反転
+            kotlinx.coroutines.delay(5000L)
+        }
+    }
+
+    // レモン画像の描画
     Image(
         painter = painterResource(id = imageResorceId),
         contentDescription = null,
-        modifier = Modifier // 画面いっぱいに表示する
-            .padding(dimensionResource(R.dimen.padding_vertical))
-    ) // 余白を追加
+        modifier = Modifier
+            .scale(scale) // アニメーションを適用
+            .padding(16.dp)
+            .padding(top = 100.dp)
+    )
 }
 
 @Composable
