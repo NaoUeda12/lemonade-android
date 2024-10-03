@@ -7,26 +7,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -37,14 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.Image
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.IntOffset
 import com.example.lemonade.ui.theme.LemonadeTheme
 import kotlinx.coroutines.delay
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,14 +76,10 @@ fun LemonApp() {
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-
                 if (showStartButton) {
                     LemonImageOnStartScreen(imageResorceId = R.drawable.lemon_squeeze)
                     StartButton(onClick = {
                         showStartButton = false // ボタンが押されたら非表示にする
-
-
                         currentStep = 1 // 現在のステップを1にする
                     })
                 } else {
@@ -145,9 +124,14 @@ fun LemonApp() {
                                 textResorcedId = R.string.Emptyglass,
                                 imageResorceId = R.drawable.lemon_restart,
                                 onImageClick = {
-                                    currentStep = 1
+                                    currentStep = 5
                                 }
                             )
+                        }
+
+                        5 -> {
+                            // ドラッグ可能なテキストの表示
+                            DraggableTextLowLevel(imageResorceId = R.drawable.lemon_squeeze)
                         }
                     }
 
@@ -185,6 +169,45 @@ fun LemonApp() {
 }
 
 @Composable
+fun DraggableTextLowLevel(imageResorceId: Int) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        var offsetX by remember { mutableStateOf(0f) }
+        var offsetY by remember { mutableStateOf(0f) }
+
+        // ドラッグ可能なボックス
+        Box(
+            Modifier
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                .size(50.dp) // サイズを適切に設定
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
+                    }
+                }
+        )
+
+        // レモンの画像をドラッグ可能なボックスの下に配置
+        Image(
+            painter = painterResource(id = imageResorceId),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 100.dp)
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) } // ドラッグに合わせてオフセット
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
+                    }
+                }
+        )
+    }
+}
+
+@Composable
 fun StartButton(onClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -197,9 +220,7 @@ fun StartButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun LemonImageOnStartScreen(
-    imageResorceId: Int
-) {
+fun LemonImageOnStartScreen(imageResorceId: Int) {
     var isExpanded by remember { mutableStateOf(true) } // 初期は拡大状態
 
     // アニメーションのスケールを制御
@@ -207,12 +228,12 @@ fun LemonImageOnStartScreen(
         targetValue = if (isExpanded) 2f else 1f, // 2倍か1倍にスケール
         animationSpec = tween(durationMillis = 4000) // 4秒で変化
     )
-    
+
     // アニメーションを5秒間繰り返す
     LaunchedEffect(Unit) {
         while (true) {
             isExpanded = !isExpanded // スケールの反転
-            kotlinx.coroutines.delay(5000L)
+            delay(5000L)
         }
     }
 
@@ -269,7 +290,5 @@ fun LemonTextAndImage(
 @Preview
 @Composable
 fun LemonPreview() {
-    LemonadeTheme {
-        LemonApp()
-    }
+    LemonApp()
 }
