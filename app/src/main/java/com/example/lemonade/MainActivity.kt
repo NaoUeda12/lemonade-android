@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -36,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.sp
 import com.example.lemonade.ui.theme.LemonadeTheme
 
 class MainActivity : ComponentActivity() {
@@ -56,9 +55,10 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun LemonApp() {
-    var currentStep by remember { mutableStateOf(1) } // 初期値が１に設定された可変のStateオブジェクトをrememberでcurrentStepに保持
+    var currentStep by remember { mutableStateOf(0) } // 0に初期化
     var squeezeCount by remember { mutableStateOf(0) }
     var showCompletionDialog by remember { mutableStateOf(false) } // ポップアップ表示フラグ
+    var showStartButton by remember { mutableStateOf(true) } // 始めるボタンの表示フラグ
 
     Scaffold(
         topBar = {
@@ -82,114 +82,121 @@ fun LemonApp() {
                 .background(MaterialTheme.colorScheme.tertiaryContainer),
             color = MaterialTheme.colorScheme.background
         ) {
-            when (currentStep) {
-                1 -> {
-                    LemonTextAndImage(
-                        textResorcedId = R.string.Lemontree,
-                        imageResorceId = R.drawable.lemon_tree,
-                        onImageClick = {
-                            currentStep = 2
-                            squeezeCount = (2..4).random() // ランダムな絞る回数を設定
-                        }
-                    )
-                }
-
-                2 -> {
-                    LemonTextAndImage(
-                        textResorcedId = R.string.Lemon,
-                        imageResorceId = R.drawable.lemon_squeeze,
-                        onImageClick = {
-                            squeezeCount--
-                            if (squeezeCount <= 0) {
-                                currentStep = 3
+            if (showStartButton) {
+                // 始めるボタンを表示
+                StartButton(onClick = {
+                    showStartButton = false // ボタンが押されたら非表示にする
+                    currentStep = 1 // 現在のステップを1にする
+                })
+            } else {
+                when (currentStep) {
+                    1 -> {
+                        LemonTextAndImage(
+                            textResorcedId = R.string.Lemontree,
+                            imageResorceId = R.drawable.lemon_tree,
+                            onImageClick = {
+                                currentStep = 2
+                                squeezeCount = (2..4).random() // ランダムな絞る回数を設定
                             }
-                        },
-                        squeezeCount = squeezeCount // squeezeCountを渡す
-                    )
+                        )
+                    }
+
+                    2 -> {
+                        LemonTextAndImage(
+                            textResorcedId = R.string.Lemon,
+                            imageResorceId = R.drawable.lemon_squeeze,
+                            onImageClick = {
+                                squeezeCount--
+                                if (squeezeCount <= 0) {
+                                    currentStep = 3
+                                }
+                            },
+                            squeezeCount = squeezeCount // squeezeCountを渡す
+                        )
+                    }
+
+                    3 -> {
+                        LemonTextAndImage(
+                            textResorcedId = R.string.Glassoflemonade,
+                            imageResorceId = R.drawable.lemon_drink,
+                            onImageClick = {
+                                showCompletionDialog = true // 完成ポップアップを表示
+                            }
+                        )
+                    }
+
+                    4 -> {
+                        LemonTextAndImage(
+                            textResorcedId = R.string.Emptyglass,
+                            imageResorceId = R.drawable.lemon_restart,
+                            onImageClick = {
+                                currentStep = 1
+                            }
+                        )
+                    }
                 }
 
-                3 -> {
-                    LemonTextAndImage(
-                        textResorcedId = R.string.Glassoflemonade,
-                        imageResorceId = R.drawable.lemon_drink,
-                        onImageClick = {
-                            showCompletionDialog = true // 完成ポップアップを表示
+                // ポップアップダイアログ
+                if (showCompletionDialog) {
+                    AlertDialog(
+                        onDismissRequest = {
+                            showCompletionDialog = false // ポップアップを閉じる
+                            currentStep = 4
+                        },
+                        title = { Text(text = "完成！") },
+                        text = { Text(text = "レモネードが完成しました！") },
+                        confirmButton = {
+                            Button(onClick = {
+                                showCompletionDialog = false // ポップアップを閉じる
+                                currentStep = 4
+                            }) {
+                                Text("閉じる")
+                            }
                         }
                     )
                 }
-
-                4 -> {
+                else if (currentStep == 4) {
                     LemonTextAndImage(
                         textResorcedId = R.string.Emptyglass,
                         imageResorceId = R.drawable.lemon_restart,
                         onImageClick = {
-                            currentStep = 1
+                            currentStep = 1 // 再スタートする場合の処理
                         }
                     )
                 }
-            }
-
-            // ポップアップダイアログ
-            if (showCompletionDialog) {
-                AlertDialog(
-                    onDismissRequest = {
-                        showCompletionDialog = false // ポップアップを閉じる
-                        currentStep = 4
-                    },
-                    title = { Text(text = "完成！") },
-                    text = { Text(text = "レモネードが完成しました！") },
-                    confirmButton = {
-                        Button(onClick = {
-                            showCompletionDialog = false // ポップアップを閉じる
-                            currentStep = 4
-                        }) {
-                            Text("閉じる")
-                        }
-                    }
-                )
-            }
-            else if (currentStep == 4) {
-                LemonTextAndImage(
-                    textResorcedId = R.string.Emptyglass,
-                    imageResorceId = R.drawable.lemon_restart,
-                    onImageClick = {
-                        currentStep = 1 // 再スタートする場合の処理
-                    }
-                )
             }
         }
     }
 }
 
 @Composable
+fun StartButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center // 中央に配置
+    ) {
+        Button(onClick = onClick) {
+            Text("始める") // 始めるボタンのテキスト
+        }
+    }
+}
+@Composable
 fun LemonTextAndImage(
     textResorcedId: Int,
     imageResorceId: Int,
+    squeezeCount: Int = 0,
     onImageClick: () -> Unit,
-    squeezeCount: Int = 0, // squeezeCountを追加
+
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            // 絞る回数を画像の上に表示
-            if (squeezeCount > 0) {
-                Text(
-                    text = "$squeezeCount",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    ),
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
             Button(
                 onClick = onImageClick,
                 shape = RoundedCornerShape(dimensionResource(R.dimen.button_corner_radius)),
