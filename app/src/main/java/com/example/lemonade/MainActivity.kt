@@ -82,87 +82,96 @@ fun LemonApp() {
                 .background(MaterialTheme.colorScheme.tertiaryContainer),
             color = MaterialTheme.colorScheme.background
         ) {
-            if (showStartButton) {
-                // 始めるボタンを表示
-                StartButton(onClick = {
-                    showStartButton = false // ボタンが押されたら非表示にする
-                    currentStep = 1 // 現在のステップを1にする
-                })
-            } else {
-                when (currentStep) {
-                    1 -> {
-                        LemonTextAndImage(
-                            textResorcedId = R.string.Lemontree,
-                            imageResorceId = R.drawable.lemon_tree,
-                            onImageClick = {
-                                currentStep = 2
-                                squeezeCount = (2..4).random() // ランダムな絞る回数を設定
-                            }
-                        )
-                    }
+            Column(
+                modifier = Modifier.fillMaxSize(), // サイズを親に合わせる
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-                    2 -> {
-                        LemonTextAndImage(
-                            textResorcedId = R.string.Lemon,
-                            imageResorceId = R.drawable.lemon_squeeze,
-                            onImageClick = {
-                                squeezeCount--
-                                if (squeezeCount <= 0) {
-                                    currentStep = 3
+
+                if (showStartButton) {
+                    LemonImageOnStartScreen(imageResorceId = R.drawable.lemon_squeeze)
+                    StartButton(onClick = {
+                        showStartButton = false // ボタンが押されたら非表示にする
+
+
+                        currentStep = 1 // 現在のステップを1にする
+                    })
+                } else {
+                    when (currentStep) {
+                        1 -> {
+                            LemonTextAndImage(
+                                textResorcedId = R.string.Lemontree,
+                                imageResorceId = R.drawable.lemon_tree,
+                                onImageClick = {
+                                    currentStep = 2
+                                    squeezeCount = (2..4).random() // ランダムな絞る回数を設定
                                 }
-                            },
-                            squeezeCount = squeezeCount // squeezeCountを渡す
-                        )
+                            )
+                        }
+
+                        2 -> {
+                            LemonTextAndImage(
+                                textResorcedId = R.string.Lemon,
+                                imageResorceId = R.drawable.lemon_squeeze,
+                                onImageClick = {
+                                    squeezeCount--
+                                    if (squeezeCount <= 0) {
+                                        currentStep = 3
+                                    }
+                                },
+                                squeezeCount = squeezeCount // squeezeCountを渡す
+                            )
+                        }
+
+                        3 -> {
+                            LemonTextAndImage(
+                                textResorcedId = R.string.Glassoflemonade,
+                                imageResorceId = R.drawable.lemon_drink,
+                                onImageClick = {
+                                    showCompletionDialog = true // 完成ポップアップを表示
+                                }
+                            )
+                        }
+
+                        4 -> {
+                            LemonTextAndImage(
+                                textResorcedId = R.string.Emptyglass,
+                                imageResorceId = R.drawable.lemon_restart,
+                                onImageClick = {
+                                    currentStep = 1
+                                }
+                            )
+                        }
                     }
 
-                    3 -> {
-                        LemonTextAndImage(
-                            textResorcedId = R.string.Glassoflemonade,
-                            imageResorceId = R.drawable.lemon_drink,
-                            onImageClick = {
-                                showCompletionDialog = true // 完成ポップアップを表示
+                    // ポップアップダイアログ
+                    if (showCompletionDialog) {
+                        AlertDialog(
+                            onDismissRequest = {
+                                showCompletionDialog = false // ポップアップを閉じる
+                                currentStep = 4
+                            },
+                            title = { Text(text = "完成！") },
+                            text = { Text(text = "レモネードが完成しました！") },
+                            confirmButton = {
+                                Button(onClick = {
+                                    showCompletionDialog = false // ポップアップを閉じる
+                                    currentStep = 4
+                                }) {
+                                    Text("閉じる")
+                                }
                             }
                         )
-                    }
-
-                    4 -> {
+                    } else if (currentStep == 4) {
                         LemonTextAndImage(
                             textResorcedId = R.string.Emptyglass,
                             imageResorceId = R.drawable.lemon_restart,
                             onImageClick = {
-                                currentStep = 1
+                                currentStep = 1 // 再スタートする場合の処理
                             }
                         )
                     }
-                }
-
-                // ポップアップダイアログ
-                if (showCompletionDialog) {
-                    AlertDialog(
-                        onDismissRequest = {
-                            showCompletionDialog = false // ポップアップを閉じる
-                            currentStep = 4
-                        },
-                        title = { Text(text = "完成！") },
-                        text = { Text(text = "レモネードが完成しました！") },
-                        confirmButton = {
-                            Button(onClick = {
-                                showCompletionDialog = false // ポップアップを閉じる
-                                currentStep = 4
-                            }) {
-                                Text("閉じる")
-                            }
-                        }
-                    )
-                }
-                else if (currentStep == 4) {
-                    LemonTextAndImage(
-                        textResorcedId = R.string.Emptyglass,
-                        imageResorceId = R.drawable.lemon_restart,
-                        onImageClick = {
-                            currentStep = 1 // 再スタートする場合の処理
-                        }
-                    )
                 }
             }
         }
@@ -180,13 +189,25 @@ fun StartButton(onClick: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun LemonImageOnStartScreen(
+    imageResorceId: Int
+) {
+    Image(
+        painter = painterResource(id = imageResorceId),
+        contentDescription = null,
+        modifier = Modifier // 画面いっぱいに表示する
+            .padding(dimensionResource(R.dimen.padding_vertical))
+    ) // 余白を追加
+}
+
 @Composable
 fun LemonTextAndImage(
     textResorcedId: Int,
     imageResorceId: Int,
     squeezeCount: Int = 0,
     onImageClick: () -> Unit,
-
     modifier: Modifier = Modifier
 ) {
     Box(
