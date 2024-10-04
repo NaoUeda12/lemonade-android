@@ -22,9 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import com.example.lemonade.ui.theme.LemonadeTheme
@@ -133,10 +131,8 @@ fun LemonApp() {
 
                         5 -> {
                             // ドラッグ可能なテキストの表示
-                            Draggablelemon(imageResorceId = R.drawable.lemon_squeeze, otherImageResorceId = R.drawable.lemon_drop)
-
-                            }
-
+                            DraggableTextLowLevel(imageResorceId = R.drawable.lemon_squeeze)
+                        }
                     }
 
                     // ポップアップダイアログ
@@ -173,30 +169,16 @@ fun LemonApp() {
 }
 
 @Composable
-fun Draggablelemon(imageResorceId: Int, otherImageResorceId: Int) {
+fun DraggableTextLowLevel(imageResorceId: Int) {
     Box(modifier = Modifier.fillMaxSize()) {
         var offsetX by remember { mutableStateOf(0f) }
         var offsetY by remember { mutableStateOf(0f) }
-        var showLemonJuice by remember { mutableStateOf(false) }
-        var lemonJuiceOffsetY by remember { mutableStateOf(0f) } // レモン汁のオフセット
 
-        // レモンの画像をドラッグ可能なボックスの下に配置
-        Image(
-            painter = painterResource(id = imageResorceId),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(16.dp)
-                .padding(top= 80.dp)
-                .offset(x = offsetX.roundToInt().dp, y = offsetY.roundToInt().dp) // ドラッグに合わせてオフセット
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            // レモンをタップしたときの処理
-                            showLemonJuice = true // レモン汁を表示
-                            lemonJuiceOffsetY = 200f // レモン汁のオフセットを設定（落ちる位置）
-                        }
-                    )
-                }
+        // ドラッグ可能なボックス
+        Box(
+            Modifier
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                .size(50.dp) // サイズを適切に設定
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
@@ -206,30 +188,25 @@ fun Draggablelemon(imageResorceId: Int, otherImageResorceId: Int) {
                 }
         )
 
-        // レモン汁を表示する要素
-        if (showLemonJuice) {
-            Image(
-                painter = painterResource(id = otherImageResorceId),
-                contentDescription = null,
-                modifier = Modifier
-                    .offset(x = offsetX.roundToInt().dp, y = (offsetY + lemonJuiceOffsetY).roundToInt().dp) // レモン汁の位置をオフセット
-                    .size(50.dp) // サイズを調整
-            )
-
-            // レモン汁が表示されたら、落ちるアニメーションを追加
-            LaunchedEffect(lemonJuiceOffsetY) {
-                if (lemonJuiceOffsetY > 0f) {
-                    delay(500) // 少し待つ
-                    lemonJuiceOffsetY += 10f // 落ちる速度を調整
-                    if (lemonJuiceOffsetY > 600f) { // 画面下部に達したら
-                        showLemonJuice = false // レモン汁を非表示にする
-                        lemonJuiceOffsetY = 0f // オフセットをリセット
+        // レモンの画像をドラッグ可能なボックスの下に配置
+        Image(
+            painter = painterResource(id = imageResorceId),
+            contentDescription = null,
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(top = 100.dp)
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) } // ドラッグに合わせてオフセット
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
                     }
                 }
-            }
-        }
+        )
     }
 }
+
 @Composable
 fun StartButton(onClick: () -> Unit) {
     Box(
