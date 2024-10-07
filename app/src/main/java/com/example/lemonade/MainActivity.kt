@@ -150,7 +150,7 @@ fun LemonTextAndImage(
                 Text(
                     text = "$squeezeCount",
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 24.sp,
+                        fontSize = 50.sp,
                         fontWeight = FontWeight.Bold
                     ),
                 )
