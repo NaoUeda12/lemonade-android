@@ -89,10 +89,6 @@ fun LemonApp() {
             ) {
 
 
-                if (showStartButton) {
-                    LemonImageOnStartScreen(imageResorceId = R.drawable.lemon_squeeze)
-                    
-                } else {
                     when (currentStep) {
                         1 -> {
                             LemonTextAndImage(
@@ -171,19 +167,8 @@ fun LemonApp() {
             }
         }
     }
-}
 
-@Composable
-fun LemonImageOnStartScreen(
-    imageResorceId: Int
-) {
-    Image(
-        painter = painterResource(id = imageResorceId),
-        contentDescription = null,
-        modifier = Modifier // 画面いっぱいに表示する
-            .padding(dimensionResource(R.dimen.padding_vertical))
-    ) // 余白を追加
-}
+
 
 @Composable
 fun LemonTextAndImage(
