@@ -89,15 +89,6 @@ fun LemonApp() {
             ) {
 
 
-                if (showStartButton) {
-                    LemonImageOnStartScreen(imageResorceId = R.drawable.lemon_squeeze)
-                    StartButton(onClick = {
-                        showStartButton = false // ボタンが押されたら非表示にする
-
-
-                        currentStep = 1 // 現在のステップを1にする
-                    })
-                } else {
                     when (currentStep) {
                         1 -> {
                             LemonTextAndImage(
@@ -176,31 +167,8 @@ fun LemonApp() {
             }
         }
     }
-}
 
-@Composable
-fun StartButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center // 中央に配置
-    ) {
-        Button(onClick = onClick) {
-            Text("始める") // 始めるボタンのテキスト
-        }
-    }
-}
 
-@Composable
-fun LemonImageOnStartScreen(
-    imageResorceId: Int
-) {
-    Image(
-        painter = painterResource(id = imageResorceId),
-        contentDescription = null,
-        modifier = Modifier // 画面いっぱいに表示する
-            .padding(dimensionResource(R.dimen.padding_vertical))
-    ) // 余白を追加
-}
 
 @Composable
 fun LemonTextAndImage(
