@@ -91,12 +91,7 @@ fun LemonApp() {
 
                 if (showStartButton) {
                     LemonImageOnStartScreen(imageResorceId = R.drawable.lemon_squeeze)
-                    StartButton(onClick = {
-                        showStartButton = false // ボタンが押されたら非表示にする
-
-
-                        currentStep = 1 // 現在のステップを1にする
-                    })
+                    
                 } else {
                     when (currentStep) {
                         1 -> {
@@ -174,18 +169,6 @@ fun LemonApp() {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun StartButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center // 中央に配置
-    ) {
-        Button(onClick = onClick) {
-            Text("始める") // 始めるボタンのテキスト
         }
     }
 }
