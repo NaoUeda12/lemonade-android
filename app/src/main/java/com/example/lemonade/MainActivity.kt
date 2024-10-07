@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
 import com.example.lemonade.ui.theme.LemonadeTheme
 
 class MainActivity : ComponentActivity() {
@@ -63,7 +64,8 @@ fun LemonApp() {
                 title = {
                     Text(
                         text = "Lemonade",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 35.sp,
                     )
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
