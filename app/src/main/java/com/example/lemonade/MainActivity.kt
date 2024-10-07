@@ -67,9 +67,7 @@ fun LemonApp() {
                         fontWeight = FontWeight.Bold
                     )
                 },
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = colorResource(id = R.color.yellow)
-                )
+               
             )
         }
     ) { innerPadding ->
