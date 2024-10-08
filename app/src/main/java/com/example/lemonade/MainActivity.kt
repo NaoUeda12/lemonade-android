@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
 fun LemonApp() {
     var currentStep by remember { mutableStateOf(1) } // 初期値が１に設定された可変のStateオブジェクトをrememberでcurrentStepに保持
     var squeezeCount by remember { mutableStateOf(0) }
+    var showCompletionDialog by remember { mutableStateOf(false) } // ポップアップ表示フラグ
 
     Scaffold(
         topBar = {
@@ -111,7 +113,7 @@ fun LemonApp() {
                         textResorcedId = R.string.Glassoflemonade,
                         imageResorceId = R.drawable.lemon_drink,
                         onImageClick = {
-                            currentStep = 4
+                            showCompletionDialog = true // 完成ポップアップを表示
                         }
                     )
                 }
@@ -125,6 +127,35 @@ fun LemonApp() {
                         }
                     )
                 }
+            }
+
+            // ポップアップダイアログ
+            if (showCompletionDialog) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showCompletionDialog = false // ポップアップを閉じる
+                        currentStep = 4
+                    },
+                    title = { Text(text = "レモネード完成！") },
+                    text = { Text(text = "グラスが空になりました") },
+                    confirmButton = {
+                        Button(onClick = {
+                            showCompletionDialog = false // ポップアップを閉じる
+                            currentStep = 4
+                        }) {
+                            Text("閉じる")
+                        }
+                    }
+                )
+            }
+            else if (currentStep == 4) {
+                LemonTextAndImage(
+                    textResorcedId = R.string.Emptyglass,
+                    imageResorceId = R.drawable.lemon_restart,
+                    onImageClick = {
+                        currentStep = 1 // 再スタートする場合の処理
+                    }
+                )
             }
         }
     }
