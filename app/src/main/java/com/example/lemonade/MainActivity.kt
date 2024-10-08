@@ -136,8 +136,8 @@ fun LemonApp() {
                         showCompletionDialog = false // ポップアップを閉じる
                         currentStep = 4
                     },
-                    title = { Text(text = "完成！") },
-                    text = { Text(text = "レモネードが完成しました！") },
+                    title = { Text(text = "レモネード完成！") },
+                    text = { Text(text = "グラスが空になりました") },
                     confirmButton = {
                         Button(onClick = {
                             showCompletionDialog = false // ポップアップを閉じる
