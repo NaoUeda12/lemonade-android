@@ -66,7 +66,8 @@ fun LemonApp() {
                 title = {
                     Text(
                         text = "Lemonade",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 35.sp,
                     )
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
